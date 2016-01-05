@@ -1,0 +1,24 @@
+{
+  "name": "excelyourself",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://danielthepope@github.com/danielthepope/excelyourself.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danielthepope/excelyourself/issues"
+  },
+  "homepage": "https://github.com/danielthepope/excelyourself",
+  "dependencies": {
+    "excellent": "^2.1.6",
+    "express": "^4.13.3",
+    "multer": "^1.1.0"
+  }
+}
