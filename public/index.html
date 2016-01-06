@@ -1,10 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Excel yourself</title>
-  </head>
-  <body>
-    <h1>Excel yourself</h1>
-    <p>Coming soon...</p>
-  </body>
+
+<head>
+  <title>Excel yourself</title>
+</head>
+
+<body>
+  <h1>Excel yourself</h1>
+  <p>Coming soon...</p>
+
+  <iframe id="download_frame" style="display:none"></iframe>
+  <script src="webcam.js"></script>
+
+  <!--320x240-->
+  <div id="my_camera" style="width:160px; height:120px;"></div>
+  <div id="my_result"></div>
+
+  <script language="JavaScript">
+    Webcam.attach( '#my_camera' );
+
+      function take_snapshot() {
+        Webcam.snap( function(data_uri) {
+          document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
+          // document.getElementById('download_frame').src = '/toexcel?image='+data_uri;
+          Webcam.upload( data_uri, 'toexcel', function(code, text) {
+            alert(code);
+          });
+        } );
+      }
+  </script>
+
+  <a href="javascript:void(take_snapshot())">Take Snapshot</a>
+</body>
+
 </html>
