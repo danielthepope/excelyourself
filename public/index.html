@@ -101,11 +101,13 @@
     Webcam.attach( '#my_camera' );
 
     function take_snapshot() {
+      document.getElementById('excelfie_button').setAttribute('disabled', 'disabled');
       Webcam.snap( function(data_uri) {
         document.getElementById('my_result').innerHTML = '<img id="snapshot" src="'+data_uri+'" width="320" height="240" class="visible"/>';
         Webcam.upload( data_uri, 'toexcel', function(code, text) {
           document.getElementById('snapshot').setAttribute('class', 'hidden');
           document.getElementById('download_frame').src = '/excel/'+text+'/excelyourself.xlsx';
+          document.getElementById('excelfie_button').removeAttribute('disabled');
         });
       });
     }
