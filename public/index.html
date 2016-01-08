@@ -2,34 +2,104 @@
 <html>
 
 <head>
-  <title>Excel yourself</title>
+  <title>Excel yourself!</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+  crossorigin="anonymous">
+  <style>
+    body {
+      background: #FFBE48;
+    }
+    
+    #camera_container {
+      width: 360px;
+      height: 280px;
+      position: relative;
+      padding: 20px;
+      -webkit-box-shadow: 0px 7px 26px 0px rgba(0, 0, 0, 0.5);
+      -moz-box-shadow: 0px 7px 26px 0px rgba(0, 0, 0, 0.5);
+      box-shadow: 0px 7px 26px 0px rgba(0, 0, 0, 0.5);
+      margin: auto;
+      background: white;
+    }
+    
+    #my_camera,
+    #my_result {
+      width: 320px;
+      height: 240px;
+      position: absolute;
+    }
+    
+    #my_result {
+      z-index: 10;
+    }
+    
+    #snapshot {
+      /*image-rendering: optimizeSpeed;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -o-crisp-edges;
+      image-rendering: -webkit-optimize-contrast;*/
+      image-rendering: pixelated;
+      /*opacity: 1;*/
+      /*image-rendering: optimize-contrast;
+      -ms-interpolation-mode: nearest-neighbor;*/
+      transition: opacity 2s linear;
+      /*visibility 0s 2s, */
+    }
+    
+    .visible {
+      opacity: 1;
+    }
+    
+    .hidden {
+      /*visibility: hidden;*/
+      opacity: 0;
+    }
+    
+    #excelfie_button {
+      margin: 25px;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Excel yourself</h1>
-  <p>Coming soon...</p>
+  <div class="container text-center">
+    <h1>Excel yourself!</h1>
+    <p>Take a selfie with your webcam</p>
 
-  <iframe id="download_frame" style="display:none"></iframe>
+    <iframe id="download_frame" style="display:none"></iframe>
+
+    <!--320x240-->
+    <div id="camera_container" class="text-left">
+      <div id="my_camera"></div>
+      <div id="my_result"></div>
+    </div>
+    <button id="excelfie_button" type="button" onclick="take_snapshot()" class="btn btn-lg btn-success">Take Excelfie</button>
+    
+  </div>
+
   <script src="webcam.js"></script>
-
-  <!--320x240-->
-  <div id="my_camera" style="width:80px; height:60px;"></div>
-  <div id="my_result"></div>
-
   <script language="JavaScript">
+    Webcam.set({
+      width: 320,
+      height: 240,
+      dest_width: 120,
+      dest_height: 90,
+      image_format: 'jpeg',
+      jpeg_quality: 98
+    })
     Webcam.attach( '#my_camera' );
 
-      function take_snapshot() {
-        Webcam.snap( function(data_uri) {
-          document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
-          Webcam.upload( data_uri, 'toexcel', function(code, text) {
-            document.getElementById('download_frame').src = '/excel/'+text+'/excelyourself.xlsx';
-          });
-        } );
-      }
+    function take_snapshot() {
+      Webcam.snap( function(data_uri) {
+        document.getElementById('my_result').innerHTML = '<img id="snapshot" src="'+data_uri+'" width="320" height="240" class="visible"/>';
+        Webcam.upload( data_uri, 'toexcel', function(code, text) {
+          document.getElementById('snapshot').setAttribute('class', 'hidden');
+          document.getElementById('download_frame').src = '/excel/'+text+'/excelyourself.xlsx';
+        });
+      });
+    }
   </script>
 
-  <a href="javascript:void(take_snapshot())">Take Snapshot</a>
 </body>
 
 </html>
