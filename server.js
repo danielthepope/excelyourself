@@ -68,6 +68,7 @@ function imageToExcel(path, cb) {
           fgColor:{argb:fill},
           bgColor:{argb:fill}
         }
+        sheet.getCell(getCellRef(x,y)).alignment = { vertical: "middle", horizontal: "center" };
       }
     }
     var id=uuid.v4();
