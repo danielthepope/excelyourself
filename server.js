@@ -8,15 +8,6 @@ var getPixels = require('get-pixels');
 var multer = require('multer');
 var path = require('path');
 var uuid = require('uuid');
-// var storage = multer.memoryStorage();
-// var storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, 'uploads/')
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, uuid.v4() + '.jpg')
-//   }
-// })
 var upload = multer({
   limits: {
     fileSize: 512000
@@ -38,10 +29,8 @@ app.post('/toexcel', upload.single('webcam'), function (req, res) {
   console.log(file.path);
   imageToExcel(file.path, function(filename) {
     console.log(filename);
-    // res.sendFile(path.join(__dirname, filename))
     res.send(filename);
   });
-  // res.sendStatus(200);
 });
 
 app.use(express.static('public'));
@@ -82,6 +71,11 @@ function imageToExcel(path, cb) {
       }
     }
     var id=uuid.v4();
+    try {
+      fs.mkdirSync('./public/excel/');
+    } catch (e) {
+      console.log('excel folder already exists');
+    }
     fs.mkdirSync('./public/excel/'+id+'/');
     var filename = './public/excel/'+id+'/excelyourself.xlsx';
     workbook.xlsx.writeFile(filename)
