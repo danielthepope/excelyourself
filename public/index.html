@@ -10,6 +10,10 @@
       background: #FFBE48;
     }
     
+    .container {
+      max-width: 700px;
+    }
+    
     #camera_container {
       width: 360px;
       height: 280px;
@@ -18,7 +22,7 @@
       -webkit-box-shadow: 0px 7px 26px 0px rgba(0, 0, 0, 0.5);
       -moz-box-shadow: 0px 7px 26px 0px rgba(0, 0, 0, 0.5);
       box-shadow: 0px 7px 26px 0px rgba(0, 0, 0, 0.5);
-      margin: auto;
+      margin: 30px auto;
       background: white;
     }
     
@@ -34,16 +38,8 @@
     }
     
     #snapshot {
-      /*image-rendering: optimizeSpeed;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: -o-crisp-edges;
-      image-rendering: -webkit-optimize-contrast;*/
       image-rendering: pixelated;
-      /*opacity: 1;*/
-      /*image-rendering: optimize-contrast;
-      -ms-interpolation-mode: nearest-neighbor;*/
       transition: opacity 2s linear;
-      /*visibility 0s 2s, */
     }
     
     .visible {
@@ -51,21 +47,29 @@
     }
     
     .hidden {
-      /*visibility: hidden;*/
       opacity: 0;
     }
     
-    #excelfie_button {
-      margin: 25px;
+    #reasoning {
+      text-align: left;
+      margin: 30px 0;
+    }
+    
+    .highlight {
+      background: #FFE7BB;
+      padding: 20px;
+      text-align: center;
+      margin: 20px 0;
     }
   </style>
 </head>
 
 <body>
-  <div class="container text-center">
+  <div class="highlight">
     <h1>Excel yourself!</h1>
-    <p>Take a selfie with your webcam</p>
-
+    <p>Take a selfie with your webcam and download it as a spreadsheet</p>
+  </div>
+  <div class="container text-center">
     <iframe id="download_frame" style="display:none"></iframe>
 
     <!--320x240-->
@@ -74,8 +78,15 @@
       <div id="my_result"></div>
     </div>
     <button id="excelfie_button" type="button" onclick="take_snapshot()" class="btn btn-lg btn-success">Take Excelfie</button>
-    
+    <div id="reasoning">
+      <p>Now while the vast majority of you think this is a brilliant idea, I imagine some of you are probably wondering 'Why?'</p>
+      <p>I'm a fan of <a href="http://www.fotsn.com">Festival of the Spoken Nerd</a>. During their performance of Full Frontal Nerdity, <a href="https://twitter.com/standupmaths">Matt Parker</a> talked about spreadsheets, how pixels work and how an image could be considered to be a giant spreadsheet. He made a tool that allowed you to upload a photo, then a couple of seconds later, that photo would be turned into a spreadsheet with red, green and blue rows. That spreadsheet used Excel's conditional formatting, which apparently doesn't work with OpenOffice. So I made one that set the fill colour of each cell instead.</p>
+      <p>Matt's converter is <a href="http://makeanddo4d.com/spreadsheet/">here</a>. It allows you to upload a photo rather than using your webcam.</p>
+      <p>I thought it was going to take me about 3 hours to make. 2 days later, here we are.</p>
+    </div>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/UBX2QQHlQ_I" frameborder="0" allowfullscreen></iframe>
   </div>
+  <p class="highlight">An <a href="https://github.com/danielthepope/excelyourself">open source project</a> by <a href="https://twitter.com/danielthepope">@danielthepope</a></p>
 
   <script src="webcam.js"></script>
   <script language="JavaScript">
