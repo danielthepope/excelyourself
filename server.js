@@ -1,7 +1,7 @@
 var config = {
   port: process.env.PORT || 3000
 }
-var excellent = require('excellent');
+var Excel = require("exceljs");
 var express = require('express');
 var fs = require('fs');
 var getPixels = require('get-pixels');
@@ -9,20 +9,20 @@ var multer = require('multer');
 var path = require('path');
 var uuid = require('uuid');
 // var storage = multer.memoryStorage();
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, uuid.v4() + '.jpg')
-  }
-})
+// var storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, 'uploads/')
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, uuid.v4() + '.jpg')
+//   }
+// })
 var upload = multer({
   limits: {
     fileSize: 512000
   },
   fileFilter: fileFilter,
-  storage: storage
+  dest: 'uploads/'
 });
 var supportedUploadTypes = ['image/jpeg'];
 
@@ -36,8 +36,12 @@ var app = express();
 app.post('/toexcel', upload.single('webcam'), function (req, res) {
   var file = req.file;
   console.log(file.path);
-  imageToExcel(file.path);
-  res.sendStatus(200);
+  imageToExcel(file.path, function(filename) {
+    console.log(filename);
+    // res.sendFile(path.join(__dirname, filename))
+    res.send(filename);
+  });
+  // res.sendStatus(200);
 });
 
 app.use(express.static('public'));
@@ -46,8 +50,8 @@ var server = app.listen(config.port, function () {
   console.log('listening on port', config.port);
 });
 
-function imageToExcel(path) {
-  getPixels(path, function(err,pixels) {
+function imageToExcel(path, cb) {
+  getPixels(path, 'image/jpeg', function(err,pixels) {
     if (err) throw err;
     var width = pixels.shape[0];
     var height = pixels.shape[1];
@@ -58,65 +62,51 @@ function imageToExcel(path) {
       image.push([]);
       image.push([]);
       for (var x = 0; x < width; x++) {
-        image[3*y].push(pixels.data[(y*x)+(x*channels)]);
-        image[(3*y)+1].push(pixels.data[((y*x)+(x*channels))+1]);
-        image[(3*y)+2].push(pixels.data[((y*x)+(x*channels))+2]);
+        image[3*y].push(pixels.data[(y*width*channels)+(x*channels)]);
+        image[(3*y)+1].push(pixels.data[((y*width*channels)+(x*channels))+1]);
+        image[(3*y)+2].push(pixels.data[((y*width*channels)+(x*channels))+2]);
       }
     }
-    console.log('excellent...');
-    var excellentRows = image.map(function(imageRow, rowNum) {
-            return {cells: imageRow.map(function(cell) {
-              return {value: cell
-              , style: getFillColour(cell, rowNum)
-              }
-            })};
-          });
-    var colours255 = [];
-    for (var x = 0; x < 255; x++) {
-      var hex = x.toString(16);
-      colours255.push('0'+hex);
-      colours255.push('1'+hex);
-      colours255.push('2'+hex);
+    var workbook = new Excel.Workbook();
+    var sheet = workbook.addWorksheet("My Sheet");
+    for (var y = 0; y < image.length; y++) {
+      for (var x = 0; x < image[0].length; x++) {
+        sheet.getCell(getCellRef(x,y)).value = image[y][x];
+        var fill = getFillColour(image[y][x], y);
+        sheet.getCell(getCellRef(x,y)).fill = {
+          type: "pattern",
+          pattern:"solid",
+          fgColor:{argb:fill},
+          bgColor:{argb:fill}
+        }
+      }
     }
-    var excellentStyles = colours255.map(function(colour) {
-      var colourType = colour[0];
-      var hex = colour.slice(1);
-      var colourHex = '';
-      if (colourType === 0) colourHex = ('FF'+hex+'0000').toUpperCase();
-      else if (colourType === 0) colourHex = ('FF00'+hex+'00').toUpperCase();
-      else colourHex = ('FF0000'+hex).toUpperCase();
-      return {label:'C'+colour, fill: {rgb: colourHex}}
+    var id=uuid.v4();
+    fs.mkdirSync('./public/excel/'+id+'/');
+    var filename = './public/excel/'+id+'/excelyourself.xlsx';
+    workbook.xlsx.writeFile(filename)
+    .then(function() {
+        cb(id);
     });
-    var doc = excellent.create({
-      // sheets: {
-      //   'sheet1': {
-      //     rows: image
-      //   }
-      // }
-      sheets: {
-        'Summary': {
-          rows: excellentRows,
-          
-            // rows: [{
-            //     cells: [
-            //         'foo',
-            //         {value: 'bar', style: 'bold'},
-            //         {value: 'foo', style: 'lemonBg'},
-            //         'baz',
-            //         {value: 'quux', style: 'lemonBgBold'}
-            //     ]
-            // }, {
-            //     cells: ['', {value: 'WAT?!', style: 'brick'}, {value: 'dotty', style: 'dotty'}]
-            // }]
-          }
-      },
-      styles: {cellStyles: excellentStyles}
-    });
-    fs.writeFileSync('uploads/test.xlsx', doc.file);
   })
 }
 
 function getFillColour(value, row) {
   var hex = value.toString(16).toUpperCase();
-  return 'C'+ row%3 + hex;
+  if (hex.length === 1) hex = '0' + hex;
+  if (row%3 == 0) {
+    return 'FF'+hex+'0000';
+  } else if (row%3 == 1) {
+    return 'FF00'+hex+'00';
+  } else {
+    return 'FF0000'+hex;
+  }
+}
+
+function getCellRef(col, row) {
+  var letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+  var letter = '';
+  if (col >= 26) letter = letters[Math.floor(col/26)-1];
+  letter += letters[col%26];
+  return letter + (row+1);
 }

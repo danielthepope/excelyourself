@@ -13,7 +13,7 @@
   <script src="webcam.js"></script>
 
   <!--320x240-->
-  <div id="my_camera" style="width:160px; height:120px;"></div>
+  <div id="my_camera" style="width:80px; height:60px;"></div>
   <div id="my_result"></div>
 
   <script language="JavaScript">
@@ -22,9 +22,8 @@
       function take_snapshot() {
         Webcam.snap( function(data_uri) {
           document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
-          // document.getElementById('download_frame').src = '/toexcel?image='+data_uri;
           Webcam.upload( data_uri, 'toexcel', function(code, text) {
-            alert(code);
+            document.getElementById('download_frame').src = '/excel/'+text+'/excelyourself.xlsx';
           });
         } );
       }
